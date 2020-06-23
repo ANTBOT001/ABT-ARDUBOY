@@ -20,6 +20,7 @@ LiquidCrystal lcd(6, 10, 9, 14, 15, 16);
 
 int musicpin=5;
 int bellFlag=0;
+int soundFlag=0;
 byte bell[8] =
 {
  B00010,
@@ -76,6 +77,28 @@ byte bell4[8] =
  B00111,
  B00000
 };
+byte bell5[8] =
+{
+ B00000,
+ B00011,
+ B00111,
+ B11101,
+ B11101,
+ B00111,
+ B00011,
+ B00000
+};
+byte bell6[8] =
+{
+ B00001,
+ B00010,
+ B00100,
+ B01000,
+ B10000,
+ B11000,
+ B00111,
+ B00000
+};
 byte freep[8] =
 {
  B00000,
@@ -119,13 +142,15 @@ void setup() {
   {
     bell3[i] = ~bell1[i];
     bell4[i] = ~bell2[i];
+    bell6[i] = ~bell5[i];
     }  
   lcd.createChar(0, bell);
   lcd.createChar(1, bell1);
   lcd.createChar(2, bell2);
   lcd.createChar(3, bell3);
   lcd.createChar(4, bell4);
-  lcd.createChar(5, freep); 
+  lcd.createChar(5, bell5); 
+  lcd.createChar(6, bell6);
   lcd.begin(16, 2);
   ////////////////////////////////////  
   wb_H = ReadCfg(0);  
@@ -138,6 +163,9 @@ void setup() {
   mat2 = 2;
   lcd.setCursor(BellStart-2,1);
   lcd.write(mat2);
+  mat1 = 6;
+  lcd.setCursor(12,1);
+  lcd.write(mat1);
   sprintf(tmbuff,"%04dCM",((wb_H<<8)+wb_L));
   String s = String(tmbuff);
    lcd.setCursor(BellStart,1);
@@ -171,13 +199,7 @@ void loop() {
         Serial.print(distance); 
         Serial.print("cm"); 
         Serial.println(); 
-    if(bellFlag)
-    {      
-      bellFlag=0;
-      }else{
-        
-        }
- 
+     
     sprintf(disbuff,"%04dCM",int(distance));
     s = String(disbuff);
     lcd.setCursor(5,0);
@@ -198,7 +220,19 @@ void loop() {
    if(crosPos==0&&getKey()==btnSELECT)
    {
         SetClock();
-    }
+    }else if(getKey()==btnLEFT)
+    {
+      soundFlag = 1;
+      mat1 = 5;
+      lcd.setCursor(12,1);
+      lcd.write(mat1);
+      }else if(getKey()==btnRIGHT)
+    {
+      soundFlag = 0;
+      mat1 = 6;
+      lcd.setCursor(12,1);
+      lcd.write(mat1);
+      }
   
 }
 void Warnning(int b)
@@ -217,9 +251,14 @@ void Warnning(int b)
        lcd.setCursor(BellStart-3,1);
        lcd.write(mat1); 
        lcd.setCursor(BellStart-2,1);
-       lcd.write(mat2);   
-    delay(1000/b);
+       lcd.write(mat2); 
+       if(soundFlag) 
+       {
+        digitalWrite(musicpin,(i%2));       
+          }
+       delay(1000/b);
     }
+    digitalWrite(musicpin,0);  
   }
 //设置
 void SetClock(){
