@@ -222,9 +222,9 @@ void loop() {
       if(pm25<35) s=":D";
       else if(pm25<75) s=":)";
       else if(pm25<115) s=":o";
-      else if(pm25<150) s=":(";
-      else if(pm25<250) s=":X";
-      else s="F";
+      else if(pm25<150) s=":|";
+      else if(pm25<250) s=":(";
+      else s=":X";
       lcd.setCursor(14,1);
       lcd.print(s);
       }
